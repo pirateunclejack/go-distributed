@@ -24,18 +24,35 @@ func startService(ctx context.Context, serviceName registry.ServiceName, host, p
 	var srv http.Server
 	srv.Addr = ":" + port
 
-	go func() {
-		log.Println(srv.ListenAndServe())
-		cancel()
-	}()
+	go func(context.Context) {
+		select {
+			case <-ctx.Done():
+				return
+			default:
+				log.Println(srv.ListenAndServe())
+				err := registry.ShutdownService(fmt.Sprintf("http://%s:%s", host, port))
+				if err != nil {
+					log.Println(err)
+				}
+				cancel()
+		}
+	}(ctx)
 
-	go func() {
-		fmt.Printf("%v started, Press any key to stop. \n", serviceName)
-		var s string
-		fmt.Scanln(&s)
-		srv.Shutdown(ctx)
-		cancel()
-	}()
-
+	go func(context.Context) {
+		select {
+			case <-ctx.Done():
+				return
+			default:
+				fmt.Printf("%v started, Press any key to stop. \n", serviceName)
+				var s string
+				fmt.Scanln(&s)
+				err := registry.ShutdownService(fmt.Sprintf("http://%s:%s", host, port))
+				if err != nil {
+					log.Println(err)
+				}
+				cancel()
+				srv.Shutdown(ctx)
+		}
+	}(ctx)
 	return ctx
 }

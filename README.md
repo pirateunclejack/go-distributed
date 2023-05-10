@@ -13,3 +13,5 @@
 ### 2.4 excutable service registration web service
 
 ### 2.5 register a service
+
+### 2.6 cancel service registration
