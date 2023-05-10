@@ -8,7 +8,7 @@ import (
 )
 
 const ServerPort = ":3000"
-const ServiceURL = "http://localhost" + ServerPort + "/services"
+const ServicesURL = "http://localhost" + ServerPort + "/services"
 
 type registry struct {
 	registrations []Registration
