@@ -18,18 +18,22 @@ type registry struct {
 }
 
 func (r *registry) add(reg Registration) error {
+	log.Printf("Registrations before add: %v", r.registrations)
 	r.mutex.Lock()
 	r.registrations = append(r.registrations, reg)
 	r.mutex.Unlock()
+	log.Printf("Registrations after add: %v", r.registrations)
 	return nil
 }
 
 func (r *registry) remove (url string) error {
+	log.Printf("Registrations before delete: %v", r.registrations)
 	for i := range reg.registrations {
 		if reg.registrations[i].ServiceURL == url {
 			r.mutex.Lock()
 			reg.registrations = append(reg.registrations[:i], reg.registrations[i+1:]...)
 			r.mutex.Unlock()
+			log.Printf("Registrations after delete: %v", r.registrations)
 			return nil
 		}
 	}
@@ -51,21 +55,21 @@ func (s RegistryService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var r Registration
 		err := dec.Decode(&r)
 		if err != nil {
-			log.Println(err)
+			log.Printf("Failed to decode request body with error: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		log.Printf("Adding service: %v with URL: %s\n", r.ServiceName, r.ServiceURL)
 		err = reg.add(r)
 		if err != nil {
-			log.Println(err)
+			log.Printf("Failed to add service with error: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 	case http.MethodDelete:
 		payload, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.Println(err)
+			log.Printf("Failed to read request body with error: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -73,7 +77,7 @@ func (s RegistryService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Removing service at URL: %s", url)
 		err = reg.remove(url)
 		if err != nil {
-			log.Println(err)
+			log.Printf("Feiled to remove service with error: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

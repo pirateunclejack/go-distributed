@@ -27,7 +27,7 @@ func main() {
 	)
 
 	if err != nil {
-		stlog.Fatalln(err)
+		stlog.Fatalf("Failed to start service %v with error: %v", r.ServiceName, err)
 	}
 	<- ctx.Done()
 

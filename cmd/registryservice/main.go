@@ -18,7 +18,7 @@ func main() {
 	srv.Addr = registry.ServerPort
 
 	go func() {
-		log.Println(srv.ListenAndServe())
+		log.Printf("Registry service http server status: %v", srv.ListenAndServe())
 		cancel()
 	}()
 

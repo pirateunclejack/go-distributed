@@ -42,5 +42,5 @@ func RegisterHandlers() {
 }
 
 func write(message string) {
-	log.Printf("%v\n", message)
+	log.Printf("Print log with message: %v\n", message)
 }
