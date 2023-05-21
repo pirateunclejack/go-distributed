@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 func Start(ctx context.Context, host, port string, reg registry.Registration, registerHandersFunc func()) (context.Context, error) {
@@ -29,10 +30,10 @@ func startService(ctx context.Context, serviceName registry.ServiceName, host, p
 			case <-ctx.Done():
 				return
 			default:
-				log.Println(srv.ListenAndServe())
+				log.Printf("Start service http server status: %v", srv.ListenAndServe())
 				err := registry.ShutdownService(fmt.Sprintf("http://%s:%s", host, port))
 				if err != nil {
-					log.Println(err)
+					log.Printf("shutdown service with error : %v", err)
 				}
 				cancel()
 		}
@@ -48,8 +49,10 @@ func startService(ctx context.Context, serviceName registry.ServiceName, host, p
 				fmt.Scanln(&s)
 				err := registry.ShutdownService(fmt.Sprintf("http://%s:%s", host, port))
 				if err != nil {
-					log.Println(err)
+					log.Printf("shutdown service with error : %v", err)
 				}
+				fmt.Println("Sleep 1 second to stop service gentally...")
+				time.Sleep(time.Second * 1)
 				cancel()
 				srv.Shutdown(ctx)
 		}
